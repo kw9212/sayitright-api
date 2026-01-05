@@ -5,7 +5,7 @@ import { HealthService } from './health.service';
 export class HealthController {
   private readonly logger = new Logger(HealthController.name);
 
-  constructor(private readonly healthService: HealthService) { }
+  constructor(private readonly healthService: HealthService) {}
   @Get()
   health(): { ok: boolean; status: string } {
     this.logger.log('Health check endpoint called');

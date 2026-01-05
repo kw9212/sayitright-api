@@ -15,4 +15,4 @@ import { HealthService } from './health/health.service';
   controllers: [AppController, HealthController],
   providers: [AppService, HealthService],
 })
-export class AppModule { }
+export class AppModule {}
