@@ -23,4 +23,7 @@ lerna-debug.log*
 .temp
 .tmp
 
-/prisma/src/generated/prisma
+# Prisma
+/node_modules/@prisma/client
+/prisma/generated
+/prisma/**/generated
