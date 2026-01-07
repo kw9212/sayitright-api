@@ -7,7 +7,7 @@ export class HealthController {
 
   constructor(private readonly healthService: HealthService) {}
   @Get()
-  health(): { ok: boolean; status: string } {
+  health(): { status: string } {
     this.logger.log('Health check endpoint called');
     return this.healthService.checkHealth();
   }
