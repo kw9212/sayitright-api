@@ -17,10 +17,13 @@ generator client {
 model User {
   id           String  @id @default(cuid())
   email        String  @unique
-  passwordHash String
+  passwordHash String?
   username     String?
 
   creditBalance Int @default(0)
+
+  authProvider   String  @default("local")
+  authProviderId String?
 
   archives           Archive[]
   templates          Template[]
