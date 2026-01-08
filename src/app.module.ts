@@ -4,6 +4,8 @@ import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { HealthController } from './health/health.controller';
 import { HealthService } from './health/health.service';
+import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -11,6 +13,8 @@ import { HealthService } from './health/health.service';
       isGlobal: true,
       envFilePath: '.env',
     }),
+    AuthModule,
+    UsersModule,
   ],
   controllers: [AppController, HealthController],
   providers: [AppService, HealthService],
