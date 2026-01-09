@@ -104,4 +104,20 @@ export class AuthService {
 
     return { accessToken, refreshToken: newRefreshToken };
   }
+
+  async logout(refreshToken: string): Promise<void> {
+    try {
+      const payload = await this.jwt.verifyAsync<RefreshTokenPayload>(refreshToken, {
+        secret: process.env.JWT_REFRESH_SECRET ?? 'dev-refresh-secret',
+      });
+
+      if (payload.typ !== 'refresh') {
+        throw new UnauthorizedException('Invalid credentials');
+      }
+
+      await this.redis.del(this.refreshKey(payload.sub, payload.jti));
+    } catch {
+      return;
+    }
+  }
 }
