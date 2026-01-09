@@ -1,4 +1,4 @@
-import { ApiErrorResponse } from './../types/api-error-type';
+import { ApiErrorResponse } from '../types/api-error.type';
 import { ExceptionFilter, Catch, ArgumentsHost, HttpException, HttpStatus } from '@nestjs/common';
 import { Response } from 'express';
 import { ERROR_CODE, type ErrorCode } from '../types/error-code';

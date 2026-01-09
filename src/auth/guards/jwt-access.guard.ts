@@ -1,4 +1,4 @@
-import { AccessTokenPayload } from './../../common/types/jwt-payload-type';
+import { AccessTokenPayload } from '../../common/types/jwt-payload.type';
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 import type { Request } from 'express';
 import { JwtService } from '@nestjs/jwt';

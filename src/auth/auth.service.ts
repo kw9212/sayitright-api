@@ -1,4 +1,4 @@
-import { RefreshTokenPayload } from '../common/types/jwt-payload-type';
+import { RefreshTokenPayload } from '../common/types/jwt-payload.type';
 import { Inject, Injectable, ConflictException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
