@@ -120,4 +120,38 @@ export class AuthService {
       return;
     }
   }
+
+  async logoutAll(refreshToken: string): Promise<void> {
+    let payload: RefreshTokenPayload | null = null;
+    try {
+      payload = await this.jwt.verifyAsync<RefreshTokenPayload>(refreshToken, {
+        secret: process.env.JWT_REFRESH_SECRET ?? 'dev-refresh-secret',
+      });
+    } catch {
+      return;
+    }
+
+    if (!payload || payload.typ !== 'refresh') {
+      return;
+    }
+
+    const userId = payload.sub;
+    const pattern = `refresh:${userId}:*`;
+    const stream = this.redis.scanStream({ match: pattern, count: 100 });
+    const keysToDelete: string[] = [];
+
+    await new Promise<void>((resolve, reject) => {
+      stream.on('data', (keys: string[]) => {
+        keysToDelete.push(...keys);
+      });
+      stream.on('end', resolve);
+      stream.on('error', reject);
+    });
+
+    if (keysToDelete.length > 0) {
+      const pipeline = this.redis.pipeline();
+      keysToDelete.forEach((key) => pipeline.del(key));
+      await pipeline.exec();
+    }
+  }
 }
