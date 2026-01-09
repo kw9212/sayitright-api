@@ -95,7 +95,6 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    // rotate (Invalidate old refresh token)
     await this.redis.del(this.refreshKey(payload.sub, payload.jti));
 
     const newJti = randomUUID();
