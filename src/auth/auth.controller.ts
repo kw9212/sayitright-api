@@ -1,8 +1,17 @@
-import { Body, Controller, HttpCode, HttpStatus, Post, Res } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  HttpCode,
+  HttpStatus,
+  Post,
+  Req,
+  Res,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignupDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
-import type { Response } from 'express';
+import type { Request, Response } from 'express';
 
 @Controller('v1/auth')
 export class AuthController {
@@ -24,6 +33,25 @@ export class AuthController {
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       path: '/v1/auth/refresh',
+      maxAge: Number(process.env.JWT_REFRESH_TTL_SEC ?? 604800) * 1000,
+    });
+
+    return { accessToken };
+  }
+
+  @Post('refresh')
+  @HttpCode(HttpStatus.OK)
+  async refresh(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    const token: string = req.cookies?.refreshToken;
+    if (!token) throw new UnauthorizedException('Invalid credentials');
+
+    const { accessToken, refreshToken } = await this.authService.refresh(token);
+
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
       maxAge: Number(process.env.JWT_REFRESH_TTL_SEC ?? 604800) * 1000,
     });
 
