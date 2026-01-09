@@ -18,6 +18,21 @@ export class UsersService {
     });
   }
 
+  findMeById(id: string) {
+    return this.prisma.user.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        email: true,
+        username: true,
+        creditBalance: true,
+        authProvider: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+  }
+
   createLocalUser(params: {
     email: string;
     passwordHash: string;
