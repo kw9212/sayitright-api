@@ -6,3 +6,11 @@ export type RefreshTokenPayload = {
   iat: number;
   exp: number;
 };
+
+export type AccessTokenPayload = {
+  sub: string;
+  email: string;
+  typ: 'access';
+  iat?: number;
+  exp?: number;
+};
