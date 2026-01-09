@@ -75,4 +75,22 @@ export class AuthController {
 
     return;
   }
+
+  @Post('logout-all')
+  @HttpCode(HttpStatus.OK)
+  async logoutAll(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    const refreshToken: string = req.cookies?.refreshToken;
+    if (refreshToken) {
+      await this.authService.logoutAll(refreshToken);
+    }
+
+    res.clearCookie('refreshToken', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/v1/auth',
+    });
+
+    return;
+  }
 }
