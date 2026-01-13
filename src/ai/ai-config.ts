@@ -1,43 +1,40 @@
 export const AI_CONFIG = {
   TOKEN_LIMITS: {
     short: {
-      maxTokens: 300,
-      description: '간결한 이메일 (2-3 문단)',
+      maxTokens: 100,
+      description: '간결한 이메일 (~150자)',
     },
     medium: {
-      maxTokens: 500,
-      description: '일반적인 이메일 (3-5 문단)',
+      maxTokens: 200,
+      description: '일반적인 이메일 (~300자)',
     },
     long: {
-      maxTokens: 1000,
-      description: '상세한 이메일 (5-8 문단)',
+      maxTokens: 400,
+      description: '상세한 이메일 (~600자)',
     },
   },
 
-  // 고급 기능 보너스
-  ADVANCED_BONUS_TOKENS: 500,
+  ADVANCED_BONUS_TOKENS: 300,
 
-  // 사용자 등급별 제한
   USER_TIERS: {
     guest: {
       maxRequestsPerDay: 3,
       allowAdvanced: true,
-      maxTokensPerRequest: 500,
+      maxTokensPerRequest: 100,
     },
     free: {
       maxRequestsPerDay: 10,
       allowAdvanced: false,
-      maxTokensPerRequest: 500,
+      maxTokensPerRequest: 200,
     },
     premium: {
       maxRequestsPerDay: 100,
       allowAdvanced: true,
-      maxTokensPerRequest: 1500,
+      maxTokensPerRequest: 400,
       creditCostPerAdvanced: 1,
     },
   },
 
-  // AI 모델 설정
   MODEL: {
     name: 'gpt-5-mini',
     temperature: 0.7,
@@ -45,7 +42,6 @@ export const AI_CONFIG = {
   },
 };
 
-// 사용자 등급에 따른 최대 토큰 계산
 export function getMaxTokens(
   userTier: 'guest' | 'free' | 'premium',
   length: 'short' | 'medium' | 'long',
@@ -56,12 +52,10 @@ export function getMaxTokens(
 
   let maxTokens = lengthConfig.maxTokens;
 
-  // 고급 기능 사용 시 보너스 추가
   if (includeRationale) {
     maxTokens += AI_CONFIG.ADVANCED_BONUS_TOKENS;
   }
 
-  // 사용자 등급 제한 적용
   return Math.min(maxTokens, tierConfig.maxTokensPerRequest);
 }
 
@@ -78,13 +72,10 @@ export function getMaxInputCharacters(
   outputTokens: number,
   language: 'ko' | 'en',
 ): number {
-  // 프롬프트 오버헤드 (시스템 프롬프트 + 필터 설명 등)
   const PROMPT_OVERHEAD = 150;
 
-  // 입력에 사용 가능한 토큰
   const inputTokens = totalTokens - outputTokens - PROMPT_OVERHEAD;
 
-  // 언어별 토큰당 글자수
   if (language === 'ko') {
     // 한국어: 1 토큰 ≈ 1.5~2 글자 (보수적으로 1.5)
     return Math.floor(inputTokens * 1.5);
