@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import type { User } from '@prisma/client';
 import { PrismaService } from 'prisma/prisma.service';
+import { calculateUserTier, shouldUpdateTier } from '../common/utils/tier-calculator.util';
 
 @Injectable()
 export class UsersService {
@@ -25,6 +26,7 @@ export class UsersService {
         id: true,
         email: true,
         username: true,
+        tier: true,
         creditBalance: true,
         authProvider: true,
         createdAt: true,
@@ -45,6 +47,44 @@ export class UsersService {
         passwordHash,
         username,
         authProvider: 'local',
+      },
+    });
+  }
+
+  async syncUserTier(userId: string): Promise<void> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        subscriptions: true,
+      },
+    });
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    const calculatedTier = calculateUserTier({
+      creditBalance: user.creditBalance,
+      subscriptions: user.subscriptions,
+    });
+
+    if (shouldUpdateTier(user.tier, calculatedTier)) {
+      await this.prisma.user.update({
+        where: { id: userId },
+        data: { tier: calculatedTier },
+      });
+    }
+  }
+
+  async getUserWithTier(userId: string) {
+    return this.prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        subscriptions: {
+          where: {
+            status: 'active',
+          },
+        },
       },
     });
   }
