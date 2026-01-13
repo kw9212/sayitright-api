@@ -19,7 +19,8 @@ model User {
   passwordHash String?
   username     String?
 
-  creditBalance Int @default(0)
+  tier          String @default("free")
+  creditBalance Int    @default(0)
 
   authProvider   String  @default("local")
   authProviderId String?
