@@ -105,20 +105,14 @@ export function getDailyRequestLimit(tier: UserTierWithGuest): number {
   }
 }
 
-export function getInputLimitByTier(tier: UserTierWithGuest, language: 'ko' | 'en'): number {
-  const koLimits = {
+export function getInputLimitByTier(tier: UserTierWithGuest): number {
+  const limits = {
     guest: 150,
     free: 300,
     premium: 600,
   };
 
-  const enLimits = {
-    guest: 600,
-    free: 1200,
-    premium: 2400,
-  };
-
-  return language === 'ko' ? koLimits[tier] : enLimits[tier];
+  return limits[tier];
 }
 
 export function shouldUpdateTier(currentTier: string, calculatedTier: UserTier): boolean {
