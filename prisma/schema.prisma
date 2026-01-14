@@ -30,6 +30,7 @@ model User {
   expressionNotes    ExpressionNote[]
   creditTransactions CreditTransaction[]
   subscriptions      Subscription[]
+  usageTracking      UsageTracking[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -108,4 +109,21 @@ model Subscription {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model UsageTracking {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  date             String
+  basicRequests    Int    @default(0)
+  advancedRequests Int    @default(0)
+  totalTokensUsed  Int    @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, date])
+  @@index([userId, date])
 }
