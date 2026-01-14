@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException, ForbiddenException } from '@nestjs/common';
+import { Injectable, BadRequestException, ForbiddenException, Logger } from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
 import { GenerateEmailDto, GenerateEmailResponseDto } from './dto/generate-email.dto';
 import { EmailPromptBuilder } from './prompts/email-prompt.builder';
@@ -15,6 +15,7 @@ import OpenAI from 'openai';
 
 @Injectable()
 export class AiService {
+  private readonly logger = new Logger(AiService.name);
   private openai: OpenAI;
 
   constructor(
@@ -158,23 +159,20 @@ export class AiService {
       }
 
       return {
-        ok: true,
-        data: {
-          email,
-          rationale: includeRationale ? rationale : undefined,
-          appliedFilters: {
-            language: appliedFilters.language,
-            relationship: appliedFilters.relationship,
-            purpose: appliedFilters.purpose,
-            tone: appliedFilters.tone,
-            length: appliedFilters.length,
-          },
-          metadata: {
-            charactersUsed: sanitizedDraft.length,
-            tokensUsed: aiResponse.tokensUsed,
-            creditCharged,
-            remainingCredits,
-          },
+        email,
+        rationale: includeRationale ? rationale : undefined,
+        appliedFilters: {
+          language: appliedFilters.language,
+          relationship: appliedFilters.relationship,
+          purpose: appliedFilters.purpose,
+          tone: appliedFilters.tone,
+          length: appliedFilters.length,
+        },
+        metadata: {
+          charactersUsed: sanitizedDraft.length,
+          tokensUsed: aiResponse.tokensUsed,
+          creditCharged,
+          remainingCredits,
         },
       };
     } catch (error) {
@@ -182,7 +180,7 @@ export class AiService {
         throw error;
       }
 
-      console.error('[AiService] generateEmail error:', error);
+      this.logger.error('이메일 생성 중 예상치 못한 오류 발생', error);
       throw new BadRequestException('이메일 생성 중 오류가 발생했습니다.');
     }
   }
@@ -212,14 +210,14 @@ export class AiService {
       const content = completion.choices[0]?.message?.content || '';
       const tokensUsed = completion.usage?.total_tokens || 0;
 
-      console.log('[OpenAI] Tokens used:', tokensUsed);
+      this.logger.log(`OpenAI 토큰 사용량: ${tokensUsed}`);
 
       return {
         content,
         tokensUsed,
       };
     } catch (error: unknown) {
-      console.error('[OpenAI] API Error:', error);
+      this.logger.error('OpenAI API 호출 실패', error);
 
       const err = error as { code?: string; status?: number; message?: string };
 

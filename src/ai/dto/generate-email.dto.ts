@@ -34,24 +34,19 @@ export class GenerateEmailDto {
 }
 
 export class GenerateEmailResponseDto {
-  ok: boolean;
-  data?: {
-    email: string;
-    rationale?: string;
-    appliedFilters: {
-      language: 'ko' | 'en';
-      relationship?: string;
-      purpose?: string;
-      tone?: string;
-      length?: string;
-    };
-    metadata: {
-      charactersUsed: number;
-      tokensUsed: number;
-      creditCharged: number;
-      remainingCredits?: number;
-    };
+  email: string;
+  rationale?: string;
+  appliedFilters: {
+    language: 'ko' | 'en';
+    relationship?: string;
+    purpose?: string;
+    tone?: string;
+    length?: string;
   };
-  error?: string;
-  message?: string;
+  metadata: {
+    charactersUsed: number;
+    tokensUsed: number;
+    creditCharged: number;
+    remainingCredits?: number;
+  };
 }
