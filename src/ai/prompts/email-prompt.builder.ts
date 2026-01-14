@@ -15,7 +15,7 @@ export class EmailPromptBuilder {
    * @param request - 이메일 생성 요청
    * @returns 완성된 프롬프트
    */
-  private static buildUserPrompt(request: EmailGenerationRequest): string {
+  static buildUserPrompt(request: EmailGenerationRequest): string {
     const parts: string[] = [];
     const isKorean = request.language === 'ko';
 
@@ -70,6 +70,7 @@ export class EmailPromptBuilder {
             `1. First, write the complete email\n` +
             `2. After the "---RATIONALE---" separator\n` +
             `3. Explain in detail why you wrote it this way.\n` +
+            `4. Write only the explanation in Korean.\n` +
             `   (Which expressions you chose, why you used that tone, why you structured it this way, etc.)`,
         );
       }
@@ -135,12 +136,15 @@ export class EmailPromptBuilder {
   }
 
   static parseResponse(aiResponse: string): { email: string; rationale?: string } {
-    const parts = aiResponse.split('---RATIONALE---');
+    const separatorPattern =
+      /[-=]{3,}\s*(RATIONALE|rationale|Rationale|피드백|FEEDBACK)\s*[-=]{3,}/i;
+    const match = aiResponse.match(separatorPattern);
 
-    if (parts.length === 2) {
+    if (match) {
+      const parts = aiResponse.split(separatorPattern);
       return {
         email: parts[0].trim(),
-        rationale: parts[1].trim(),
+        rationale: parts[parts.length - 1].trim(),
       };
     }
 
