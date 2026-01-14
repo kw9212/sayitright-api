@@ -1,4 +1,4 @@
-import { BadRequestException, Logger } from '@nestjs/common';
+import { BadRequestException } from '@nestjs/common';
 
 export const INPUT_VALIDATION = {
   MAX_CUSTOM_INPUT_LENGTH: 50,
@@ -88,7 +88,7 @@ export function sanitizeDraft(draft: string, maxLength: number): string {
 
   for (const pattern of INPUT_VALIDATION.FORBIDDEN_PATTERNS) {
     if (pattern.test(sanitized)) {
-      Logger.warn('[Security] Suspicious pattern detected in draft:', pattern);
+      console.warn('[Security] Suspicious pattern detected in draft:', pattern);
       sanitized = sanitized.replace(pattern, '[removed]');
     }
   }
@@ -113,15 +113,15 @@ export function sanitizeCustomInputs(inputs: {
 } {
   const sanitized: typeof inputs = {};
 
-  if (inputs.relationship) {
+  if (inputs.relationship && inputs.relationship.trim() !== '') {
     sanitized.relationship = sanitizeCustomInput(inputs.relationship);
   }
 
-  if (inputs.purpose) {
+  if (inputs.purpose && inputs.purpose.trim() !== '') {
     sanitized.purpose = sanitizeCustomInput(inputs.purpose);
   }
 
-  if (inputs.tone) {
+  if (inputs.tone && inputs.tone.trim() !== '') {
     sanitized.tone = sanitizeCustomInput(inputs.tone);
   }
 
