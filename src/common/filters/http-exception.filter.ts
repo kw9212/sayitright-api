@@ -9,7 +9,6 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
 
-    // Default values
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
     let code: ErrorCode = ERROR_CODE.INTERNAL_SERVER_ERROR;
     let message = 'Internal server error';
@@ -31,14 +30,12 @@ export class HttpExceptionFilter implements ExceptionFilter {
           message = rawMessage;
           details = null;
         } else if (Array.isArray(rawMessage)) {
-          // Handle validation errors which may come as an array
           message = typeof rawError === 'string' ? rawError : 'Bad Request';
           details = rawMessage;
         } else if (typeof rawMessage === 'object' && rawMessage !== null) {
           message = typeof rawError === 'string' ? rawError : 'Bad Request';
           details = rawMessage;
         } else {
-          // no message provided or unrecognized format
           message = typeof rawError === 'string' ? rawError : message;
           details = null;
         }
@@ -56,6 +53,9 @@ export class HttpExceptionFilter implements ExceptionFilter {
           break;
         case HttpStatus.NOT_FOUND:
           code = ERROR_CODE.NOT_FOUND;
+          break;
+        case HttpStatus.CONFLICT:
+          code = ERROR_CODE.CONFLICT;
           break;
         default:
           code = ERROR_CODE.INTERNAL_SERVER_ERROR;
