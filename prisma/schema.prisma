@@ -41,16 +41,20 @@ model Archive {
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  title   String?
-  content String
+  title     String? @db.VarChar(255)
+  preview   String? @db.VarChar(200)
+  content   String  @db.Text
+  rationale String? @db.Text
 
-  tone         String
-  purpose      String?
-  target       String?
-  relationship String?
+  tone         String  @db.VarChar(100)
+  purpose      String? @db.VarChar(100)
+  target       String? @db.VarChar(100)
+  relationship String? @db.VarChar(100)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([userId, createdAt(sort: Desc)])
 }
 
 model Template {
@@ -58,17 +62,22 @@ model Template {
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  title    String
-  content  String
-  category String?
+  sourceArchiveId String? @unique
 
-  tone         String
-  purpose      String?
-  target       String?
-  relationship String?
+  title     String? @db.VarChar(255)
+  preview   String? @db.VarChar(200)
+  content   String  @db.Text
+  rationale String? @db.Text
+
+  tone         String  @db.VarChar(100)
+  purpose      String? @db.VarChar(100)
+  target       String? @db.VarChar(100)
+  relationship String? @db.VarChar(100)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([userId, createdAt(sort: Desc)])
 }
 
 model ExpressionNote {
