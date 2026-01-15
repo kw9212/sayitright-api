@@ -71,10 +71,13 @@ export function sanitizeDraft(draft: string, maxLength: number): string {
     throw new BadRequestException('이메일 내용이 비어있습니다.');
   }
 
+  const originalLength = draft.length;
   let sanitized = draft.trim();
 
   if (sanitized.length > maxLength) {
-    throw new BadRequestException(`이메일은 ${maxLength}자 이내로 제한됩니다.`);
+    throw new BadRequestException(
+      `이메일은 ${maxLength}자 이내로 제한됩니다. (현재: ${sanitized.length}자, trim 전: ${originalLength}자)`,
+    );
   }
 
   if (sanitized.length < 10) {
