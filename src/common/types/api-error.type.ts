@@ -1,9 +1,6 @@
 import type { ErrorCode } from './error-code';
 
-export type ApiSuccessResponse<T> = {
-  ok: true;
-  data: T;
-};
+export type ApiSuccessResponse<T = unknown> = { ok: true; data: T } | { ok: true };
 
 export type ApiError = {
   code: ErrorCode;
