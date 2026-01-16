@@ -1,5 +1,5 @@
 import { AccessTokenPayload } from '../../common/types/jwt-payload.type';
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable, Logger } from '@nestjs/common';
 import type { Request } from 'express';
 import { JwtService } from '@nestjs/jwt';
 
@@ -7,6 +7,8 @@ type AuthedRequest = Request & { user?: AccessTokenPayload };
 
 @Injectable()
 export class JwtOptionalGuard implements CanActivate {
+  private readonly logger = new Logger(JwtOptionalGuard.name);
+
   constructor(private readonly jwt: JwtService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -29,14 +31,18 @@ export class JwtOptionalGuard implements CanActivate {
         secret: process.env.JWT_SECRET ?? 'dev-secret',
       });
 
-      if (payload.typ !== 'access') {
+      if ((payload as { typ?: string }).typ !== 'access') {
+        this.logger.warn(`잘못된 토큰 타입: ${(payload as { typ?: string }).typ}`);
         req.user = undefined;
         return true;
       }
 
       req.user = payload;
       return true;
-    } catch {
+    } catch (error) {
+      if (error instanceof Error && !error.message.includes('jwt expired')) {
+        this.logger.warn('JWT 검증 실패:', error.message);
+      }
       req.user = undefined;
       return true;
     }
