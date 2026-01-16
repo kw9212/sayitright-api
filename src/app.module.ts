@@ -7,6 +7,8 @@ import { HealthService } from './health/health.service';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { AiModule } from './ai/ai.module';
+import { ArchivesModule } from './archives/archives.module';
+import { TemplatesModule } from './templates/templates.module';
 
 @Module({
   imports: [
@@ -17,6 +19,8 @@ import { AiModule } from './ai/ai.module';
     AuthModule,
     UsersModule,
     AiModule,
+    ArchivesModule,
+    TemplatesModule,
   ],
   controllers: [AppController, HealthController],
   providers: [AppService, HealthService],
