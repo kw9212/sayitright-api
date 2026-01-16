@@ -44,6 +44,11 @@ export class AiService {
         : 'guest';
 
       const maxInputLength = getInputLimitByTier(tier);
+
+      this.logger.log(
+        `[generateEmail] userId=${userId || 'guest'}, tier=${tier}, maxLength=${maxInputLength}`,
+      );
+
       const sanitizedDraft = sanitizeDraft(dto.draft, maxInputLength);
 
       const sanitizedCustomInputs = sanitizeCustomInputs({
@@ -141,14 +146,29 @@ export class AiService {
       }
 
       if (user) {
+        const preview = email.length > 200 ? email.substring(0, 197) + '...' : email;
+
+        const archiveData = {
+          userId: user.id,
+          preview,
+          content: email,
+          rationale: includeRationale && rationale ? rationale : null,
+          tone: appliedFilters.tone || 'neutral',
+          purpose: appliedFilters.purpose,
+          relationship: appliedFilters.relationship,
+        };
+
+        this.logger.log('[Archive Create] 필드 길이 체크:', {
+          previewLength: preview?.length || 0,
+          contentLength: email.length,
+          rationaleLength: archiveData.rationale?.length || 0,
+          toneLength: archiveData.tone?.length || 0,
+          purposeLength: archiveData.purpose?.length || 0,
+          relationshipLength: archiveData.relationship?.length || 0,
+        });
+
         await this.prisma.archive.create({
-          data: {
-            userId: user.id,
-            content: email,
-            tone: appliedFilters.tone || 'neutral',
-            purpose: appliedFilters.purpose,
-            relationship: appliedFilters.relationship,
-          },
+          data: archiveData,
         });
 
         await this.usageTracking.incrementUsage(
@@ -217,7 +237,27 @@ export class AiService {
         tokensUsed,
       };
     } catch (error: unknown) {
-      this.logger.error('OpenAI API 호출 실패', error);
+      if (error instanceof Error) {
+        this.logger.error('[generateEmail] 에러 발생:', {
+          name: error.name,
+          message: error.message,
+          stack: error.stack?.split('\n')[0],
+        });
+      } else {
+        this.logger.error('[generateEmail] 알 수 없는 에러:', error);
+      }
+
+      if (
+        error &&
+        typeof error === 'object' &&
+        'response' in error &&
+        error.response &&
+        typeof error.response === 'object' &&
+        'statusCode' in error.response &&
+        error.response.statusCode === 400
+      ) {
+        throw error;
+      }
 
       const err = error as { code?: string; status?: number; message?: string };
 
