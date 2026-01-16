@@ -17,8 +17,18 @@ export class SuccessResponseInterceptor implements NestInterceptor {
     _context: ExecutionContext,
     next: CallHandler,
   ): Observable<ApiSuccessResponse<unknown>> {
-    return next
-      .handle()
-      .pipe(map((data: unknown) => (isSuccessResponse(data) ? data : { ok: true, data })));
+    return next.handle().pipe(
+      map((data: unknown) => {
+        if (isSuccessResponse(data)) {
+          return data;
+        }
+
+        if (data === undefined) {
+          return { ok: true };
+        }
+
+        return { ok: true, data };
+      }),
+    );
   }
 }
