@@ -20,7 +20,7 @@ export class AuthService {
   private signAccessToken(user: { id: string; email: string }) {
     return this.jwt.signAsync(
       { sub: user.id, email: user.email, typ: 'access' },
-      { expiresIn: '5m' },
+      { expiresIn: '30m' },
     );
   }
 

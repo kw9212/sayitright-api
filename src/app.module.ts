@@ -9,6 +9,7 @@ import { UsersModule } from './users/users.module';
 import { AiModule } from './ai/ai.module';
 import { ArchivesModule } from './archives/archives.module';
 import { TemplatesModule } from './templates/templates.module';
+import { NotesModule } from './notes/notes.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { TemplatesModule } from './templates/templates.module';
     AiModule,
     ArchivesModule,
     TemplatesModule,
+    NotesModule,
   ],
   controllers: [AppController, HealthController],
   providers: [AppService, HealthService],
