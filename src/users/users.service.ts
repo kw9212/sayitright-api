@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
-import type { User } from '@prisma/client';
+import { Injectable, BadRequestException } from '@nestjs/common';
+import type { User, Prisma } from '@prisma/client';
 import { PrismaService } from 'prisma/prisma.service';
 import { calculateUserTier, shouldUpdateTier } from '../common/utils/tier-calculator.util';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -86,6 +87,33 @@ export class UsersService {
           },
         },
       },
+    });
+  }
+
+  async updateProfile(
+    userId: string,
+    data: { username?: string; password?: string },
+  ): Promise<User> {
+    const updateData: Prisma.UserUpdateInput = {};
+
+    if (data.username !== undefined) {
+      updateData.username = data.username.trim() || null;
+    }
+
+    if (data.password !== undefined) {
+      if (data.password.length < 8 || data.password.length > 72) {
+        throw new BadRequestException('비밀번호는 8자 이상 72자 이하여야 합니다.');
+      }
+      updateData.passwordHash = await bcrypt.hash(data.password, 10);
+    }
+
+    if (Object.keys(updateData).length === 0) {
+      throw new BadRequestException('변경할 정보가 없습니다.');
+    }
+
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: updateData,
     });
   }
 }
