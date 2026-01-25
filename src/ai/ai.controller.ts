@@ -2,6 +2,7 @@ import { Controller, Post, Body, UseGuards, Req } from '@nestjs/common';
 import { AiService } from './ai.service';
 import { GenerateEmailDto, GenerateEmailResponseDto } from './dto/generate-email.dto';
 import { JwtOptionalGuard } from '../auth/guards/jwt-optional.guard';
+import { IpRateLimitGuard } from '../common/guards/ip-rate-limit.guard';
 import type { AuthRequest } from '../common/types/auth-request.type';
 
 @Controller('v1/ai')
@@ -9,7 +10,7 @@ export class AiController {
   constructor(private readonly aiService: AiService) {}
 
   @Post('generate-email')
-  @UseGuards(JwtOptionalGuard)
+  @UseGuards(JwtOptionalGuard, IpRateLimitGuard)
   async generateEmail(
     @Body() dto: GenerateEmailDto,
     @Req() req: AuthRequest,
