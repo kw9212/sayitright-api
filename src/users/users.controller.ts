@@ -3,6 +3,7 @@ import { UsersService } from './users.service';
 import { Controller, Get, Put, Body, NotFoundException, Req, UseGuards } from '@nestjs/common';
 import { JwtAccessGuard } from '../auth/guards/jwt-access.guard';
 import { UpdateProfileDto } from './dto/update-profile.dto';
+import { UpdateTierDto } from './dto/update-tier.dto';
 
 @UseGuards(JwtAccessGuard)
 @Controller('v1/users')
@@ -26,6 +27,19 @@ export class UsersController {
       id: user.id,
       email: user.email,
       username: user.username,
+      updatedAt: user.updatedAt,
+    };
+  }
+
+  @Put('me/tier')
+  async updateTier(@Req() req: AuthRequest, @Body() dto: UpdateTierDto) {
+    const user = await this.usersService.updateTier(req.user.sub, dto.tier);
+
+    return {
+      id: user.id,
+      email: user.email,
+      username: user.username,
+      tier: user.tier,
       updatedAt: user.updatedAt,
     };
   }

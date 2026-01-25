@@ -116,4 +116,11 @@ export class UsersService {
       data: updateData,
     });
   }
+
+  async updateTier(userId: string, tier: 'free' | 'premium'): Promise<User> {
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: { tier },
+    });
+  }
 }
