@@ -73,9 +73,9 @@ ssh -i "$KEY_PATH" "$EC2_USER@$EC2_IP" << ENDSSH
         cd $PROJECT_DIR
     fi
 
-    # 의존성 설치
+    # 의존성 설치 (빌드를 위해 모든 의존성 설치)
     echo "   📦 의존성 설치 중..."
-    NODE_ENV=production npm install --omit=dev
+    npm install
 ENDSSH
 
 echo "   ✅ 코드 배포 완료"
@@ -109,6 +109,10 @@ ssh -i "$KEY_PATH" "$EC2_USER@$EC2_IP" << ENDSSH
     # 프로젝트 빌드
     echo "   🔨 프로젝트 빌드 중..."
     npm run build
+    
+    # 프로덕션 의존성만 남기기 (빌드 후)
+    echo "   🧹 개발 의존성 제거 중..."
+    npm prune --production
 ENDSSH
 
 echo "   ✅ 빌드 완료"
