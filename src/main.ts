@@ -20,8 +20,13 @@ async function bootstrap() {
       transform: true,
     }),
   );
+  // CORS 설정: 환경변수로 허용된 origin만 접근 가능
+  const corsOrigins = process.env.CORS_ORIGINS
+    ? process.env.CORS_ORIGINS.split(',').map((origin) => origin.trim())
+    : ['http://localhost:3000'];
+
   app.enableCors({
-    origin: true,
+    origin: corsOrigins,
     credentials: true,
   });
   app.use(cookieParser());
