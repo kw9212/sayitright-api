@@ -75,7 +75,7 @@ ssh -i "$KEY_PATH" "$EC2_USER@$EC2_IP" << ENDSSH
 
     # 의존성 설치 (빌드를 위해 모든 의존성 설치)
     echo "   📦 의존성 설치 중..."
-    npm install
+    CI=true npm install
 ENDSSH
 
 echo "   ✅ 코드 배포 완료"
