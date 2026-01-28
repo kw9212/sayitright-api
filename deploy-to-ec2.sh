@@ -75,7 +75,7 @@ ssh -i "$KEY_PATH" "$EC2_USER@$EC2_IP" << ENDSSH
 
     # 의존성 설치
     echo "   📦 의존성 설치 중..."
-    npm install --production
+    NODE_ENV=production npm install --omit=dev
 ENDSSH
 
 echo "   ✅ 코드 배포 완료"
