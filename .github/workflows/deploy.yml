@@ -47,7 +47,7 @@ jobs:
             npm prune --production
             
             # PM2로 서버 재시작
-            pm2 restart sayitright-api || pm2 start dist/main.js --name sayitright-api
+            pm2 restart sayitright-api || pm2 start dist/src/main.js --name sayitright-api
             pm2 save
             
             echo "✅ 배포 완료!"
