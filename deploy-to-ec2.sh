@@ -128,7 +128,7 @@ ssh -i "$KEY_PATH" "$EC2_USER@$EC2_IP" << 'ENDSSH'
     pm2 delete sayitright-api 2>/dev/null || true
     
     # 새 프로세스 시작
-    pm2 start dist/main.js --name sayitright-api
+    pm2 start dist/src/main.js --name sayitright-api
     
     # PM2 자동 시작 설정
     pm2 save
