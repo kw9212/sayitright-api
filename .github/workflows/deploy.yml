@@ -1,0 +1,49 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Deploy to EC2
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. 코드 체크아웃
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. EC2에 SSH로 접속해서 배포
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: 43.201.99.231
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd sayitright-api
+
+            # 최신 코드 가져오기
+            git fetch origin main
+            git reset --hard origin/main
+
+            # 의존성 설치
+            CI=true npm install
+
+            # Prisma 마이그레이션
+            npx prisma migrate deploy
+            npx prisma generate
+
+            # 빌드
+            npm run build
+
+            # 개발 의존성 제거
+            npm prune --production
+
+            # PM2로 서버 재시작
+            pm2 restart sayitright-api || pm2 start dist/main.js --name sayitright-api
+            pm2 save
+
+            echo "✅ 배포 완료!"
