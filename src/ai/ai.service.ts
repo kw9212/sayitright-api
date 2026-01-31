@@ -1,5 +1,5 @@
 import { Injectable, BadRequestException, ForbiddenException, Logger } from '@nestjs/common';
-import { PrismaService } from 'prisma/prisma.service';
+import { PrismaService } from '../../prisma/prisma.service';
 import { GenerateEmailDto, GenerateEmailResponseDto } from './dto/generate-email.dto';
 import { EmailPromptBuilder } from './prompts/email-prompt.builder';
 import { sanitizeDraft, sanitizeCustomInputs } from '../common/utils/sanitize-input.util';
@@ -29,6 +29,17 @@ export class AiService {
 
   async generateEmail(dto: GenerateEmailDto, userId?: string): Promise<GenerateEmailResponseDto> {
     try {
+      this.logger.log('[generateEmail] 요청 데이터:', {
+        userId: userId || 'guest',
+        draftLength: dto.draft?.length || 0,
+        language: dto.language,
+        relationship: dto.relationship,
+        purpose: dto.purpose,
+        tone: dto.tone,
+        length: dto.length,
+        includeRationale: dto.includeRationale,
+      });
+
       const user = userId
         ? await this.prisma.user.findUnique({
             where: { id: userId },
@@ -43,10 +54,19 @@ export class AiService {
           })
         : 'guest';
 
-      const maxInputLength = getInputLimitByTier(tier);
+      // 고급 기능 사용 시 length에 따른 입력 제한 적용
+      let maxInputLength = getInputLimitByTier(tier);
+      if (dto.length) {
+        const lengthLimits: Record<string, number> = {
+          short: 150,
+          medium: 300,
+          long: 600,
+        };
+        maxInputLength = lengthLimits[dto.length] || maxInputLength;
+      }
 
       this.logger.log(
-        `[generateEmail] userId=${userId || 'guest'}, tier=${tier}, maxLength=${maxInputLength}`,
+        `[generateEmail] userId=${userId || 'guest'}, tier=${tier}, length=${dto.length || 'none'}, maxLength=${maxInputLength}`,
       );
 
       const sanitizedDraft = sanitizeDraft(dto.draft, maxInputLength);
@@ -92,8 +112,8 @@ export class AiService {
         language: dto.language,
         relationship: relationship && relationship.trim() !== '' ? relationship : undefined,
         purpose: purpose && purpose.trim() !== '' ? purpose : undefined,
-        tone: tone && tone.trim() !== '' ? tone : undefined,
-        length: length && length.trim() !== '' ? length : undefined,
+        tone: tone && typeof tone === 'string' && tone.trim() !== '' ? tone : undefined,
+        length: length && typeof length === 'string' && length.trim() !== '' ? length : undefined,
       };
 
       const includeRationale = usesAdvancedFeatures && !!dto.includeRationale;

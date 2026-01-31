@@ -1,13 +1,23 @@
 import { ApiErrorResponse } from '../types/api-error.type';
-import { ExceptionFilter, Catch, ArgumentsHost, HttpException, HttpStatus } from '@nestjs/common';
-import { Response } from 'express';
+import {
+  ExceptionFilter,
+  Catch,
+  ArgumentsHost,
+  HttpException,
+  HttpStatus,
+  Logger,
+} from '@nestjs/common';
+import { Request, Response } from 'express';
 import { ERROR_CODE, type ErrorCode } from '../types/error-code';
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
+  private readonly logger = new Logger(HttpExceptionFilter.name);
+
   catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
+    const request = ctx.getRequest<Request>();
 
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
     let code: ErrorCode = ERROR_CODE.INTERNAL_SERVER_ERROR;
@@ -61,6 +71,15 @@ export class HttpExceptionFilter implements ExceptionFilter {
           code = ERROR_CODE.INTERNAL_SERVER_ERROR;
           break;
       }
+    }
+
+    // 로깅 추가
+    if (status === HttpStatus.BAD_REQUEST) {
+      this.logger.warn(`[${request.method}] ${request.url} - 400 Bad Request`, {
+        message,
+        details,
+        body: request.body,
+      });
     }
 
     const body: ApiErrorResponse = {
