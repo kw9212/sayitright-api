@@ -131,6 +131,7 @@ export const createTestUser = (overrides = {}) => ({
   username: 'testuser',
   passwordHash: '$2b$10$testHashedPassword',
   authProvider: 'local' as const,
+  authProviderId: null,
   tier: 'free' as const,
   creditBalance: 0,
   createdAt: new Date('2024-01-01'),
