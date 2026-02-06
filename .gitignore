@@ -27,3 +27,8 @@ lerna-debug.log*
 /node_modules/@prisma/client
 /prisma/generated
 /prisma/**/generated
+
+# Test coverage
+coverage
+*.lcov
+.nyc_output
