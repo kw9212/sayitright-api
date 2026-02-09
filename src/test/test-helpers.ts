@@ -44,6 +44,7 @@ export const createMockPrismaService = () => ({
     create: jest.fn(),
     update: jest.fn(),
     delete: jest.fn(),
+    deleteMany: jest.fn(),
     count: jest.fn(),
   },
   subscription: {
@@ -69,6 +70,13 @@ export const createMockPrismaService = () => ({
   creditTransaction: {
     create: jest.fn(),
     findMany: jest.fn(),
+  },
+  usageTracking: {
+    findUnique: jest.fn(),
+    findMany: jest.fn(),
+    create: jest.fn(),
+    upsert: jest.fn(),
+    update: jest.fn(),
   },
 });
 
