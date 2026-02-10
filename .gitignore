@@ -32,3 +32,6 @@ lerna-debug.log*
 coverage
 *.lcov
 .nyc_output
+
+# VSCode workspace
+*.code-workspace
