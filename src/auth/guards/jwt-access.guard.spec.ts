@@ -18,7 +18,10 @@ describe('JwtAccessGuard', () => {
   let guard: JwtAccessGuard;
   let jwtService: jest.Mocked<JwtService>;
 
-  const createMockExecutionContext = (headers: any = {}, user?: any): ExecutionContext => {
+  const createMockExecutionContext = (
+    headers: Record<string, string> = {},
+    user?: { sub: string; email: string },
+  ): ExecutionContext => {
     return {
       switchToHttp: () => ({
         getRequest: () => ({
@@ -26,7 +29,7 @@ describe('JwtAccessGuard', () => {
           user,
         }),
       }),
-    } as any;
+    } as ExecutionContext;
   };
 
   beforeEach(async () => {
@@ -69,10 +72,8 @@ describe('JwtAccessGuard', () => {
 
       // Then: 통과
       expect(result).toBe(true);
-      expect(jwtService.verifyAsync).toHaveBeenCalledWith(
-        'valid-token-123',
-        expect.any(Object),
-      );
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(jwtService.verifyAsync).toHaveBeenCalledWith('valid-token-123', expect.any(Object));
     });
 
     it('Authorization 헤더가 없으면 UnauthorizedException을 던진다', async () => {
