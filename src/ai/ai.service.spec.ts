@@ -24,7 +24,7 @@ jest.mock('../common/utils/sanitize-input.util', () => ({
     }
     return draft;
   }),
-  sanitizeCustomInputs: jest.fn((inputs: any) => inputs),
+  sanitizeCustomInputs: jest.fn((inputs: Record<string, string>) => inputs),
 }));
 
 describe('AiService', () => {
@@ -97,7 +97,9 @@ describe('AiService', () => {
       };
 
       // When & Then: BadRequestException 발생 (실제로는 catch되어 다른 메시지로 나옴)
-      await expect(service.generateEmail(dto, userId)).rejects.toThrow('이메일 생성 중 오류가 발생했습니다');
+      await expect(service.generateEmail(dto, userId)).rejects.toThrow(
+        '이메일 생성 중 오류가 발생했습니다',
+      );
     });
 
     it('guest 사용자는 기본 기능만 사용할 수 있어야 한다', async () => {
@@ -146,6 +148,7 @@ describe('AiService', () => {
       await service.generateEmail(dto, userId);
 
       // Then: 사용량 체크됨
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(usageTracking.checkUsageLimit).toHaveBeenCalledWith(userId, 'free', false);
     });
 
@@ -209,6 +212,7 @@ describe('AiService', () => {
 
       // Then: 생성됨
       expect(result).toBeDefined();
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(usageTracking.checkUsageLimit).toHaveBeenCalledWith(
         userId,
         'premium',
@@ -225,7 +229,7 @@ describe('AiService', () => {
         subscriptions: [],
       };
       prisma.user.findUnique.mockResolvedValue(user as any);
-      
+
       usageTracking.checkUsageLimit.mockResolvedValue({
         allowed: true,
         remaining: 50,
