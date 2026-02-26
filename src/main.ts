@@ -33,9 +33,21 @@ async function bootstrap() {
 
   const config = new DocumentBuilder()
     .setTitle('SayItRight API')
-    .setDescription('The SayItRight API description')
+    .setDescription(
+      `SayItRight 서비스의 REST API 문서입니다.\n\n` +
+        `## 응답 형식\n` +
+        `모든 성공 응답은 \`{ ok: true, data: ... }\` 형태로 래핑됩니다.\n` +
+        `오류 응답은 \`{ ok: false, error: { code, message } }\` 형태입니다.\n\n` +
+        `## 인증\n` +
+        `- **Access Token**: \`Authorization: Bearer <token>\` 헤더로 전달\n` +
+        `- **Refresh Token**: HttpOnly 쿠키(\`refreshToken\`)로 자동 관리`,
+    )
     .setVersion('1.0')
-    .addBearerAuth()
+    .addBearerAuth(
+      { type: 'http', scheme: 'bearer', bearerFormat: 'JWT', in: 'header' },
+      'access-token',
+    )
+    .addCookieAuth('refreshToken', { type: 'apiKey', in: 'cookie', name: 'refreshToken' })
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
