@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/node';
 import { ApiErrorResponse } from '../types/api-error.type';
 import {
   ExceptionFilter,
@@ -71,6 +72,17 @@ export class HttpExceptionFilter implements ExceptionFilter {
           code = ERROR_CODE.INTERNAL_SERVER_ERROR;
           break;
       }
+    }
+
+    // 예상치 못한 서버 에러(5xx)만 Sentry에 수집 (4xx는 클라이언트 실수이므로 제외)
+    if (status >= HttpStatus.INTERNAL_SERVER_ERROR) {
+      Sentry.captureException(exception, {
+        extra: {
+          method: request.method,
+          url: request.url,
+          body: request.body,
+        },
+      });
     }
 
     // 로깅 추가
