@@ -87,27 +87,6 @@ export class UsersController {
   }
 
   @ApiOperation({
-    summary: '플랜 등급 변경',
-    description: '사용자의 플랜을 free 또는 premium으로 변경합니다.',
-  })
-  @ApiOkResponse({
-    schema: {
-      properties: {
-        ok: { type: 'boolean', example: true },
-        data: {
-          type: 'object',
-          properties: {
-            id: { type: 'string', example: 'clx1abc123' },
-            email: { type: 'string', example: 'user@example.com' },
-            username: { type: 'string', example: '홍길동', nullable: true },
-            tier: { type: 'string', enum: ['free', 'premium'], example: 'premium' },
-            updatedAt: { type: 'string', example: '2024-01-01T00:00:00.000Z' },
-          },
-        },
-      },
-    },
-  })
-  @ApiOperation({
     summary: '비밀번호 변경',
     description: '현재 비밀번호 확인 및 이메일 인증 코드 검증 후 비밀번호를 변경합니다.',
   })
@@ -130,6 +109,27 @@ export class UsersController {
     return { message: '비밀번호가 변경되었습니다.' };
   }
 
+  @ApiOperation({
+    summary: '플랜 등급 변경',
+    description: '사용자의 플랜을 free 또는 premium으로 변경합니다.',
+  })
+  @ApiOkResponse({
+    schema: {
+      properties: {
+        ok: { type: 'boolean', example: true },
+        data: {
+          type: 'object',
+          properties: {
+            id: { type: 'string', example: 'clx1abc123' },
+            email: { type: 'string', example: 'user@example.com' },
+            username: { type: 'string', example: '홍길동', nullable: true },
+            tier: { type: 'string', enum: ['free', 'premium'], example: 'premium' },
+            updatedAt: { type: 'string', example: '2024-01-01T00:00:00.000Z' },
+          },
+        },
+      },
+    },
+  })
   @Put('me/tier')
   async updateTier(@Req() req: AuthRequest, @Body() dto: UpdateTierDto) {
     const user = await this.usersService.updateTier(req.user.sub, dto.tier);
