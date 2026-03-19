@@ -1,5 +1,11 @@
 import { RefreshTokenPayload } from '../common/types/jwt-payload.type';
-import { Inject, Injectable, ConflictException, UnauthorizedException } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  ConflictException,
+  UnauthorizedException,
+  BadRequestException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { UsersService } from '../users/users.service';
@@ -119,6 +125,17 @@ export class AuthService {
     } catch {
       return;
     }
+  }
+
+  async resetPassword(email: string, newPassword: string): Promise<void> {
+    const user = await this.usersService.findByEmail(email);
+
+    if (!user || !user.passwordHash) {
+      throw new BadRequestException('비밀번호를 재설정할 수 없는 계정입니다.');
+    }
+
+    const newHash = await bcrypt.hash(newPassword, 10);
+    await this.usersService.updatePasswordHash(user.id, newHash);
   }
 
   async logoutAll(refreshToken: string): Promise<void> {

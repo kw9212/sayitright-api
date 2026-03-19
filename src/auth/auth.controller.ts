@@ -23,6 +23,7 @@ import { SignupDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
 import { SendVerificationCodeDto } from './dto/send-verification-code.dto';
 import { VerifyEmailCodeDto } from './dto/verify-email-code.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 import { EmailVerificationService } from '../email/email-verification.service';
 import type { Request, Response } from 'express';
 
@@ -74,6 +75,27 @@ export class AuthController {
   async verifyEmailCode(@Body() dto: VerifyEmailCodeDto) {
     const verified = await this.emailVerificationService.verifyCode(dto.email, dto.code);
     return { verified };
+  }
+
+  @ApiOperation({
+    summary: '비밀번호 재설정',
+    description: '이메일 인증 코드 검증 후 비밀번호를 재설정합니다. 로그인 없이 사용 가능합니다.',
+  })
+  @ApiOkResponse({
+    schema: {
+      properties: {
+        ok: { type: 'boolean', example: true },
+        message: { type: 'string', example: '비밀번호가 재설정되었습니다.' },
+      },
+    },
+  })
+  @ApiBadRequestResponse({ description: '유효하지 않은 인증 코드 또는 재설정 불가 계정' })
+  @Post('reset-password')
+  @HttpCode(HttpStatus.OK)
+  async resetPassword(@Body() dto: ResetPasswordDto) {
+    await this.emailVerificationService.verifyCode(dto.email, dto.emailCode);
+    await this.authService.resetPassword(dto.email, dto.newPassword);
+    return { message: '비밀번호가 재설정되었습니다.' };
   }
 
   @ApiOperation({ summary: '회원가입', description: '이메일 인증 완료 후 회원가입합니다.' })

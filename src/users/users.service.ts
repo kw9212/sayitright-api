@@ -145,6 +145,13 @@ export class UsersService {
     });
   }
 
+  async updatePasswordHash(userId: string, passwordHash: string): Promise<void> {
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { passwordHash },
+    });
+  }
+
   async updateTier(userId: string, tier: 'free' | 'premium'): Promise<User> {
     return this.prisma.user.update({
       where: { id: userId },
