@@ -60,6 +60,26 @@ export class GenerateEmailDto {
   @IsOptional()
   @IsBoolean()
   includeRationale?: boolean;
+
+  @ApiPropertyOptional({
+    example: '안녕하세요. 내일 미팅을 오후 3시로 변경하고자 합니다...',
+    description: '재작성 기준이 되는 기존 이메일 본문 (최대 2000자)',
+    maxLength: 2000,
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(2000)
+  previousEmail?: string;
+
+  @ApiPropertyOptional({
+    example: '더 공손한 표현으로 바꿔주세요',
+    description: '재작성 피드백/요청 사항 (최대 200자)',
+    maxLength: 200,
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(200)
+  refinementFeedback?: string;
 }
 
 export class GenerateEmailResponseDto {

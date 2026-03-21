@@ -19,7 +19,21 @@ export class EmailPromptBuilder {
     const parts: string[] = [];
     const isKorean = request.language === 'ko';
 
-    if (isKorean) {
+    if (request.previousEmail && request.refinementFeedback) {
+      if (isKorean) {
+        parts.push(
+          `다음 이메일을 아래 피드백에 맞게 수정해주세요.\n\n` +
+            `[기존 이메일]\n${request.previousEmail}\n\n` +
+            `[수정 요청]\n"${request.refinementFeedback}"\n`,
+        );
+      } else {
+        parts.push(
+          `Please refine the following email based on the feedback below.\n\n` +
+            `[Original Email]\n${request.previousEmail}\n\n` +
+            `[Refinement Request]\n"${request.refinementFeedback}"\n`,
+        );
+      }
+    } else if (isKorean) {
       parts.push(`다음 내용을 바탕으로 이메일을 작성해주세요:\n"${request.content}"\n`);
     } else {
       parts.push(`Please write an email based on the following content:\n"${request.content}"\n`);

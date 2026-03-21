@@ -114,6 +114,8 @@ export class AiService {
         length: appliedFilters.length,
         language: dto.language,
         includeRationale,
+        previousEmail: dto.previousEmail,
+        refinementFeedback: dto.refinementFeedback,
       });
 
       const aiResponse = await this.callOpenAI(prompts);

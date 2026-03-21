@@ -6,6 +6,8 @@ export type EmailGenerationRequest = {
   length?: string;
   language: 'ko' | 'en';
   includeRationale: boolean;
+  previousEmail?: string;
+  refinementFeedback?: string;
 };
 
 export type EmailGenerationResponse = {
