@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 
-// Husky 설치 스크립트 (개발 환경에서만)
+// Husky v9 설치 스크립트 (개발 환경에서만)
 const fs = require('fs');
 const path = require('path');
+const { execSync } = require('child_process');
 
 // CI 환경이거나 프로덕션 환경이면 스킵
 if (process.env.CI || process.env.NODE_ENV === 'production') {
@@ -16,14 +17,13 @@ if (!fs.existsSync(path.join(__dirname, '..', '.git'))) {
   process.exit(0);
 }
 
-// husky 설치
+// Husky v9: core.hooksPath를 .husky로 설정
 try {
-  const husky = require('husky');
-  if (husky.install) {
-    husky.install();
-    console.log('Husky installed successfully');
-  }
+  execSync('git config core.hooksPath .husky', {
+    cwd: path.join(__dirname, '..'),
+    stdio: 'ignore',
+  });
+  console.log('Husky installed successfully (core.hooksPath = .husky)');
 } catch (e) {
-  // husky가 없거나 설치 실패해도 무시
-  console.log('Husky install skipped');
+  console.log('Husky install skipped:', e.message);
 }
